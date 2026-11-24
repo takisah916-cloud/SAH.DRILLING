@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SAH.DRILLING</title>
+<style>
+:root{--bg:#eef2f6;--card:#fff;--tx:#14202b;--mut:#5d6b78;--ac:#f26a1b;--ac2:#ffb36b;--bd:#dbe3ea;--hd:#eaf0f6;--h1:#0b2239;--h2:#1c5384;--sh:0 2px 10px rgba(15,40,70,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d141c;--card:#17212c;--tx:#e8eef4;--mut:#93a3b3;--ac:#ff8a3d;--bd:#26364a;--hd:#1e2c3b;--sh:none}}
+:root[data-theme="dark"]{--bg:#0d141c;--card:#17212c;--tx:#e8eef4;--mut:#93a3b3;--ac:#ff8a3d;--bd:#26364a;--hd:#1e2c3b;--sh:none}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{margin:10px 12px 0;padding:18px 16px;border-radius:18px;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 6px 18px rgba(11,34,57,.25);position:relative;overflow:hidden}
+header:after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(var(--ac),transparent 70%);opacity:.35}
+.lg{flex:none;width:50px;height:50px;border-radius:14px;background:rgba(255,255,255,.12);display:grid;place-items:center;border:1px solid rgba(255,255,255,.25)}
+h1{margin:0;font-size:23px;letter-spacing:.5px;font-weight:800}
+h1 span{color:var(--ac2)}
+header p{margin:2px 0 0;color:#c4d6e8;font-size:13px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:12px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:9px 15px;border-radius:22px;font:inherit;font-size:14px;font-weight:600;box-shadow:var(--sh)}
+nav button.on{background:linear-gradient(135deg,var(--ac),#ff9a4d);border-color:transparent;color:#fff}
+main{padding:2px 12px 32px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+label{display:block;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--mut);margin:10px 0 4px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+input:focus,select:focus{outline:2px solid var(--ac);border-color:transparent}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.res div{background:var(--hd);border-radius:12px;padding:10px 12px;border-left:3px solid var(--ac)}
+.res b{display:block;font-size:19px;color:var(--tx);margin-top:2px;word-break:break-word}
+.res span{font-size:12px;color:var(--mut)}
+.tw{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{padding:8px 10px;border-bottom:1px solid var(--bd);text-align:left}
+th{background:var(--hd);position:sticky;top:0;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--mut)}
+.note{font-size:12px;color:var(--mut);margin-top:10px}
+.ub{padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-weight:600}
+.ub.on{background:var(--ac);border-color:var(--ac);color:#fff}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:0 12px 18px}
+</style>
+</head>
+<body>
+<header><div class="lg"><svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3 8 27M16 3l8 24M11 17h10M9.5 23h13M16 3v24"/><path d="M5 29h22" stroke="#ffb36b"/></svg></div><div><h1>SAH<span>.DRILLING</span></h1><p>Outils de forage · fonctionne hors ligne</p></div></header>
+<nav id="nav"></nav>
+<main id="m"></main>
+<footer>SAH.DRILLING</footer>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const f=(n,d=2)=>isFinite(n)?(+n).toLocaleString('fr-FR',{maximumFractionDigits:d}):'–';
+const rows=s=>s.trim().split('\n').map(r=>r.split('|'));
+// ---- DATA (from the sheets) ----
+const TQ=rows(`DP 2 3/8|2 3/8 IF|6.65# G105|ID 44.5 / OD 85.7 mm|68 / 68|6735 / 8659|18729 / 24080|19806 / 25465|3279|110
+DP 3½|3 1/2 IF|13.30# G105|ID 61.9 / OD 127.0 mm|135 / 173|20106 / 25850|16820 / 21626|17664 / 22711|9879|110
+DP 5|4 1/2 IF|19.5# G105|ID 82.6 / OD 165.1 mm|198 / 254|45199 / 58113|8765 / 10029|12163 / 15638|21914|111
+DP 5½|5 1/2 FH|21.9# G105|ID 88.9 / OD 184.2 mm|219 / 281|55809 / 71754|6865 / 7496|11027 / 14177|27645|011
+DC 3 1/8|2 3/8 REG|32.63 kg/m|OD 3 1/8" · ID 31.72 mm|–|–|–|–|3000|100
+DC 4¾|3 1/2 IF|69.61 kg/m|OD 4 3/4" · ID 57.1 mm|–|–|–|–|9986|111
+DC 6½|4 IF|147.92 kg/m|OD 6 1/2" · ID 57.1 mm|–|–|–|–|28021|111
+DC 8|6 5/8 REG|223.11 kg/m|OD 8" · ID 71.07 mm|–|–|–|–|53346|011
+DC 9½|7 5/8 REG|323.18 kg/m|OD 9 1/2" · ID 76.14 mm|–|–|–|–|88580|001
+HW 3½|3 1/2 IF|26#|ID 55.6 / OD 120.7 mm|156|17587|–|–|9904|111
+HW 5|4 1/2 IF|50#|ID 79.4 / OD 165.12 mm|313|51409|–|–|29409|111
+HW 5½|5 1/2 FH|60#|OD 177.66 mm|380|–|–|–|27645|011
+CSG 30|–|157.5# X52|–|1098|–|–|–|–|000
+CSG 18 5/8|–|87.5#|–|620|–|K55 630*|K55 2250*|7928|011
+CSG 13 3/8|–|68#|–|970|–|J55 1950*|J55 3450*|8000|011
+CSG 9 5/8|–|53.5#|–|776|–|P110 7950*|P110 10900*|14197|011
+CSG 9 5/8|–|47#|–|776|–|P110 5310*|P110 9440*|14197|011
+CSG 7|–|32#|–|465|–|P110 10760*|P110 12460*|8924|011
+Bit 16"|7 5/8 REG|–|–|–|–|–|–|67000|001
+Bit 12 1/4|6 5/8 REG|–|–|–|–|–|–|42400|011
+Bit 8 1/2|4 1/2 REG|–|–|–|–|–|–|19500|011
+Bit 6"|3 1/2 REG|–|–|–|–|–|–|9000|111`);
+// name, steel, ext, int (l/m)
+const VL=rows(`DP 2 3/8|1.189|2.84|1.66
+DP 3½|2.79|6.61|3.82
+DP 5|4.15|13.2|9.05
+DP 5½|4.45|16.05|11.6
+DC 3 1/8|4.15|4.94|0.79
+DC 4¾|9.4|11.43|2.03
+DC 6½|18.84|21.41|2.57
+DC 8|28.42|32.43|4.01
+DC 9½|41.17|45.73|4.56
+HW 3½|4.81|7.0|2.19
+HW 5|9.36|13.97|4.61
+HW 5½|10.28|16.05|5.77
+CSG 30|30|448.85|418.85
+CSG 18 5/8|16.04|175.77|159.73
+CSG 13 3/8|12.55|90.65|78.1
+CSG 9 5/8 (53.5#)|10.03|46.94|36.91
+CSG 9 5/8 (47#)|8.76|46.94|38.18
+CSG 7|6.01|24.83|18.82
+CSG 4 1/2|2.47|10.26|7.79
+Tubing 2 7/8|1.17|4.19|3.02
+Tubing 2 3/8|0.84|2.86|2.02`);
+const LN=[['Liner 6" – 16.68',16.68],['Liner 6½" – 19.58',19.58],['Liner 5½" – 14.02',14.02]];
+// name, kg/m
+const WT=rows(`DP 2 3/8|9.9
+DP 3½|21.89
+DP 5|32.55
+DP 5½|37.58
+DC 3 1/8|32.63
+DC 4¾|69.61
+DC 6½|147.92
+DC 8|223.1
+DC 9½|323.2
+HW 3½|37.3
+HW 5|73.4
+HW 5½|84.4
+CSG 30|235.07
+CSG 18 5/8|130.2
+CSG 13 3/8|101.18
+CSG 9 5/8 (53.5#)|79.61
+CSG 9 5/8 (47#)|69.94
+CSG 7|47.62
+CSG 4 1/2|20.09`);
+const CV=[['in → cm',2.54],['mm → in',0.0394],['m → ft',3.2808],['bar → psi',14.5],['MPa → psi',145.038],['bbl → m³',0.1589],['kg → lbs',2.20462],['N → lbs',0.22481],['ton → lbs',2204.62],['kg/m → lbs/ft',0.672],['ppg → s.g',0.1199],['L → gallons',0.2642],['daN → lbs',2.25],['daN.m → lb.ft',7.38]];
+const FL=rows(`1 13/16" 10M BX151|8|0.75|3.75|5.5
+2 1/16" 2M RX23|8|0.625|3.625|5
+2 1/16" 3M/5M RX24|8|0.875|4.625|6.5
+2 1/16" 10M BX152|8|0.75|3.875|5.5
+2 9/16" 3M/5M RX27|8|1|5.125|7
+2 9/16" 10M BX153|8|0.875|4.375|6.5
+3 1/16" 10M BX154|8|1|5|7.25
+3 1/8" 5M RX35|8|1.125|5.625|7.75
+4 1/16" 5M RX39|8|1.25|6.125|8.5
+4 1/16" 10M BX155|8|1.125|5.75|8.5
+5 1/8" 5M RX44|8|1.5|7.375|10.5
+5 1/8" 10M BX169|12|1.125|6|9.25
+7 1/16" 5M RX45|12|1.375|7.5|11.25
+7 1/16" 10M BX156|12|1.5|7.75|11.75
+9" 5M RX50|12|1.625|8.5|12.5
+9" 10M BX157|16|1.5|8.5|13.5
+11" 5M RX54|12|1.875|9.625|14.25
+11" 10M BX158|16|1.75|9.75|15.25
+13 5/8" 5M BX160|16|1.625|8.375|12.75
+13 5/8" 10M BX159|20|1.875|11|17.75
+16 3/4" 5M BX162|16|1.875|9.5|14.75
+16 3/4" 10M BX162|24|1.875|11|17.75
+18 3/4" 5M BX163|20|2|11.25|17.75
+18 3/4" 10M BX164|24|2.25|14|22.75
+20 3/4" 3M RX74|20|2|10.125|15
+21 1/4" 2M RX73|24|1.625|8.375|12.25
+21 1/4" 5M BX165|24|2|11.75|19
+21 1/4" 10M BX166|24|2.5|15.125|24.75
+26 3/4" 2M BX167|20|1.75|9.125|14.25
+26 3/4" 3M BX168|24|2|11|17.5
+30" 2M BX303|32|1.625|9.25|14.5
+30" 3M BX303|32|1.875|11|17.75`);
+const BR=rows(`1 13/16"|||BX 151|BX 151|BX 151
+2 1/16"|R-RX 23|R-RX 24|R-RX 24|BX 152|BX 152|BX 152
+2 9/16"|R-RX 26|R-RX 27|R-RX 27|BX 153|BX 153|BX 153
+3 1/16"||||BX 154|BX 154|BX 154
+3 1/8"|R-RX 31|R-RX 31|R-RX 35|||
+4 1/16"|R-RX 37|R-RX 37|R-RX 39|BX 155|BX 155|BX 155
+5 1/8"|R-RX 41|R-RX 41|R-RX 44|BX 169||
+7 1/16"|R-RX 45|R-RX 45|R-RX 46|BX 156|BX 156|BX 156
+9"|R-RX 49|R-RX 49|R-RX 50|BX 157|BX 157|
+11"|R-RX 53|R-RX 53|R-RX 54|BX 158|BX 158|
+13 5/8"|R-RX 57|R-RX 57|BX 160|BX 159||
+16 3/4"|R-RX 65|R-RX 66|BX 162|BX 162||
+18 3/4"|||BX 163|BX 164||
+20 3/4"||R-RX 74||||
+21 1/4"|R-RX 73||BX 165|BX 164||`);
+const SL=rows(`DSC 3"–4"|DCS-S|2628|49|13|14-628
+DSC 4"–4 7/8"|DCS-S|2620|49|8|14-620
+DSC 4 1/2"–6"|DCS-R|2628|63|16|14-628
+DSC 5 1/2"–7"|DCS-R|2620|63|11|14-620
+DSC 5 1/2"–7"|DCS-L|2513|88|19|14-513
+DSC 6 3/4"–9 1/2"|DCS-L|2630|88|15|14-630
+DSC 8"–9 1/2"|DCS-L|2630|96|16|14-630
+DSC 8 1/2"–10"|DCS-L|2627|104|26|14-627
+DSC 9 1/4"–11 1/4"|DCS-L|2630|112|19|14-630
+DSC 11"–12 3/4"|DCS-L|2625|136|20|14-625
+DSC 12"–14"|DCS-L|2630|136|22|14-630
+DSP 3 1/2" – tub 3 1/2"|BASIC|2162|30 SDML|10|23-155
+DSP 3 1/2" – tub 2 7/8"|REDUCER|2161|30 SDML|15|23-156
+DSP 3 1/2" – tub 2 3/8"|REDUCER|2160|30 SDML|20|23-157
+DSP 4 1/2" – tub 4 1/2"|BASIC|2165|45/54|15/18|23-158
+DSP 4 1/2" – tub 4"|REDUCER|2164|45/54|23/27|23-159
+DSP 4 1/2" – tub 3 1/2"|REDUCER|2163|45/54|30/36|23-160
+DSP 5" – tub 5"|BASIC|2167|45/54|15/18|23-161
+DSP 5" – tub 4 1/2"|REDUCER|2166|45/54|23/27|23-162
+DSP 5" – tub 4"|REDUCER|2168|45/54|30/36|23-163
+DSP 5 1/2" – tub 5 1/2"|BASIC|2170|45/54|15/18|23-164
+DSP 5 1/2" – tub 5"|REDUCER|2169|45/54|23/27|23-165
+DSP 5 1/2" – tub 4 1/2"|REDUCER|2168|45/54|30/36|23-163
+DSP 7" – tub 7"|BASIC|2173|60/72|20/26|23-166
+DSP 7" – tub 6 5/8"|REDUCER|2172|60/72|25/41|23-167`);
+// ---- UI helpers ----
+const opts=(a,i=0)=>a.map((r,k)=>`<option value="${k}">${Array.isArray(r)?r[i]:r}</option>`).join('');
+const inp=(id,l,v,st='any')=>`<div><label for="${id}">${l}</label><input id="${id}" type="number" inputmode="decimal" step="${st}" value="${v}"></div>`;
+const res=(a)=>`<div class="res">${a.map(x=>`<div><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}</div>`;
+const tbl=(h,b,id)=>`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody id="${id||''}">${b}</tbody></table></div>`;
+const trs=b=>b.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+const search=(id,ph)=>`<input id="${id}" type="search" placeholder="${ph}" style="margin-bottom:4px">`;
+function filt(data,sid,tid,map){const q=$(sid).value.toLowerCase();$(tid).innerHTML=trs((data.filter(r=>r.join(' ').toLowerCase().includes(q))).map(map||(r=>r)));}
+// ---- TABS ----
+const T={
+torque:{n:'Couple de serrage',h:()=>`<div class="card"><div class="row"><button class="ub" id="u1">daN.m</button><button class="ub" id="u2">lb.ft</button></div><label>Outil</label><select id="a">${TQ.map((r,k)=>`<option value="${k}">${r[0]}${r[2]!=='–'?' · '+r[2]:''}</option>`).join('')}</select>${inp('lv','Longueur de bras personnalisée (m)',1.19)}<div id="o"></div><p class="note">Force = (couple ft.lb ÷ 7,38) ÷ longueur du bras · (–) = non applicable dans le fichier d’origine · BV35 : tiges 2 3/8–7" (35 000 ft.lb) · BV65 : 3 1/2–8 1/4" (65 000 ft.lb) · BV100 : 4–21" (100 000 ft.lb) · lb.ft : bras en pieds comme dans la feuille (3,936 / 4,264 / 4,592 ft) · 1 m = 3,28 ft</p><p class="note">* Valeurs d’écrasement et d’éclatement des tubages CSG tirées des tables API (Bulletin 5C2), pas de votre fichier : vérifiez la nuance et le raccord réels. Le CSG 30 est un conducteur, non dimensionné en écrasement/éclatement.</p></div>`,
+ i:()=>{const u=()=>{const r=TQ[$('#a').value],L=+$('#lv').value,ft=+r[8],ok=r[8]!=='–',d=ft/7.38,Z=[1.19,1.29,1.39],lb=window.LB,Zf=[3.936,4.264,4.592],U=lb?'lbs':'daN',fb=k=>ok&&r[9][k]==='1'?f(lb?ft/Zf[k]:d/Z[k],0):'–';$('#o').innerHTML=res([['Raccord',r[1]],['Dimensions',r[3]],['Couple '+(lb?'lb.ft':'daN.m'),ok?f(lb?ft:d,0):'–'],['Force BV35 ('+(lb?'3,936 ft':'1,19 m')+') '+U,fb(0)],['Force BV65 ('+(lb?'4,264 ft':'1,29 m')+') '+U,fb(1)],['Force BV100 ('+(lb?'4,592 ft':'1,39 m')+') '+U,fb(2)],['Force bras '+f(L,2)+' m '+U,ok&&L>0?f(lb?ft/(L*3.28):d/L,0):'–'],['Traction (t) G105 / S135',r[4]],['Torsion (ft.lb)',r[5]],['Écrasement (psi)',r[6]],['Éclatement (psi)',r[7]]])};['#a','#lv'].forEach(x=>$(x).oninput=u);const sb=v=>{window.LB=v;$('#u1').classList.toggle('on',!v);$('#u2').classList.toggle('on',v);u()};$('#u1').onclick=()=>sb(0);$('#u2').onclick=()=>sb(1);sb(window.LB||0)}},
+vol:{n:'Volumes & coups',h:()=>`<div class="card"><label>Outil</label><select id="a">${opts(VL)}</select><div class="row">${inp('l','Longueur (m)',18)}<div><label>Débit pompe (L/coup)</label><select id="p">${opts(LN)}</select></div></div>${inp('c','ou débit personnalisé (L/coup)','')}<div id="o"></div><p class="note">Volume = (L/m × longueur) ÷ 1000 · Coups = volume intérieur ÷ débit de la pompe</p></div>`,
+ i:()=>{const u=()=>{const r=VL[$('#a').value],L=+$('#l').value,out=+$('#c').value||LN[$('#p').value][1],k=L/1000;$('#o').innerHTML=res([['Volume acier m³',f(r[1]*k,4)],['Volume extérieur m³',f(r[2]*k,4)],['Volume intérieur m³',f(r[3]*k,4)],['Coups (intérieur)',f(r[3]*k*1000/out,2)]])};['#a','#l','#p','#c'].forEach(s=>$(s).oninput=u);u()}},
+wt:{n:'Poids & camion',h:()=>`<div class="card"><label>Outil</label><select id="a">${opts(WT)}</select><div class="row">${inp('l','Longueur totale (m)',28)}${inp('d','Densité boue (s.g)',1.09)}</div><div class="row">${inp('j','Longueur tube (m)',9.2)}${inp('k','Charge camion (t)',30)}</div><div id="o"></div><button class="ub on" id="ad" style="width:100%;margin-top:12px">➕ Ajouter à la liste (longueur ci-dessus)</button></div><div class="card"><b>Liste des tubes (cumul)</b><div id="ls"></div>${inp('tp','Poids supplémentaires (t), ex. Top Drive – sans flottabilité',0)}<div id="tt"></div><button class="ub" id="cl" style="width:100%;margin-top:10px">Vider la liste</button></div><div class="card"><p class="note">Facteur de flottabilité = 1 − densité boue ÷ 7,85 · DC 3 1/8 : le fichier d’origine indiquait 11,4 kg/m (erreur), remplacé par 32,63 kg/m (feuille couple, cohérent avec le volume d’acier 4,15 L/m) · DC 6½ corrigé de 161,1 à 147,92 et DC 4¾ de 68,6 à 69,61 kg/m, conformément aux tables Drilling Tools (99,5 et 46,8 lb/ft)</p></div>`,
+ i:()=>{const u=()=>{const w=+WT[$('#a').value][1],L=+$('#l').value,b=1-$('#d').value/7.85,pj=w*$('#j').value/1000;$('#o').innerHTML=res([['Poids total (t)',f(w*L/1000,3)],['Poids immergé (t)',f(w*L/1000*b,3)],['Facteur de flottabilité',f(b,4)],['Poids d’un tube (t)',f(pj,3)],['Tubes par camion',Math.floor($('#k').value/pj)||'–'],['Camions pour la longueur',f(L/$('#j').value/(Math.floor($('#k').value/pj)||1),2)]])};window.WL=window.WL||[];const rl=()=>{const b=1-$('#d').value/7.85,tp=+$('#tp').value||0;let L=0,W=0;WL.forEach(x=>{L+=x.L;W+=x.w*x.L/1000});$('#ls').innerHTML=WL.length?tbl(['Outil','Long. m','Poids t','Immergé','✕'],WL.map((x,k)=>`<tr><td>${x.n}</td><td>${f(x.L,2)}</td><td>${f(x.w*x.L/1000,3)}</td><td>${f(x.w*x.L/1000*b,3)}</td><td><button class="ub" data-k="${k}">✕</button></td></tr>`).join('')):'<p class="note">Liste vide – choisissez un outil et une longueur puis cliquez sur Ajouter</p>';$('#tt').innerHTML=res([['Longueur totale (m)',f(L,2)],['Poids total (t)',f(W+tp,3)],['Poids immergé (t)',f(W*b+tp,3)],['Facteur de flottabilité',f(b,4)]])};$('#ad').onclick=()=>{const r=WT[$('#a').value];WL.push({n:r[0],w:+r[1],L:+$('#l').value});rl()};$('#cl').onclick=()=>{WL.length=0;rl()};$('#ls').onclick=e=>{const k=e.target.dataset.k;if(k!==undefined){WL.splice(+k,1);rl()}};$('#tp').oninput=rl;['#a','#l','#d','#j','#k'].forEach(s=>$(s).oninput=()=>{u();rl()});u();rl()}},
+cv:{n:'Conversions',h:()=>`<div class="card"><label>Conversion</label><select id="a">${opts(CV)}</select>${inp('v','Valeur',1)}<label><input type="checkbox" id="r" style="width:auto"> Sens inverse</label><div id="o"></div></div>`,
+ i:()=>{const u=()=>{const c=CV[$('#a').value],v=+$('#v').value,[x,y]=c[0].split(' → '),rv=$('#r').checked;$('#o').innerHTML=res([[rv?y+' → '+x:c[0],f(rv?v/c[1]:v*c[1],5)],['Facteur',c[1]]])};['#a','#v','#r'].forEach(s=>$(s).oninput=u);u()}},
+fl:{n:'Brides',h:()=>`<div class="card">${search('q','Rechercher (ex. BX158 ou 11")…')}${tbl(['Bride','N','Boulon in','Goujon DSA in','Goujon DFA in'],'','tb')}<p class="note">DSA : goujon taraudé · DFA : goujon entre deux brides</p></div>`,
+ i:()=>{const u=()=>filt(FL,'#q','#tb');$('#q').oninput=u;u()}},
+br:{n:'Joints BX/RX',h:()=>`<div class="card"><p style="margin:0">Numéro de joint selon le diamètre et la pression (PSI)</p>${search('q','Rechercher…')}${tbl(['Size','2000','3000','5000','10000','15000','20000'],'','tb')}</div>`,
+ i:()=>{const u=()=>filt(BR,'#q','#tb');$('#q').oninput=u;u()}},
+sl:{n:'Coins DSC/DSP',h:()=>`<div class="card">${search('q','Rechercher (ex. 5 1/2 ou REDUCER)…')}${tbl(['Size','Type','Ref','Qty','Wt/set','AOT#'],'','tb')}<p class="note">Remarque : la répétition de la référence 2168 / 23-163 pour DSP 5" – tub 4" et DSP 5 1/2" – tub 4 1/2" figure dans le catalogue du fabricant (Keystone) ; ce n’est pas une erreur de votre fichier.</p></div>`,
+ i:()=>{const u=()=>filt(SL,'#q','#tb');$('#q').oninput=u;u()}}
+};
+const I={torque:'🔧',vol:'🧪',wt:'⚖️',cv:'🔁',fl:'⭕',br:'🔘',sl:'🛠️'};const nav=$('#nav');
+nav.innerHTML=Object.keys(T).map(k=>`<button data-k="${k}">${I[k]} ${T[k].n}</button>`).join('');
+function show(k){nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));$('#m').innerHTML=T[k].h();T[k].i();location.hash=k}
+nav.onclick=e=>{if(e.target.dataset.k)show(e.target.dataset.k)};
+show(T[location.hash.slice(1)]?location.hash.slice(1):'torque');
+</script>
+</body>
+</html>
